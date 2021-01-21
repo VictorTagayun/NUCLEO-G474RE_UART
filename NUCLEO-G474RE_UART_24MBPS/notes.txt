@@ -1,0 +1,44 @@
+Project 	 : NUCLEO-G474RE_UART_24MBPS
+Purpose 	 : Try more than 24Mbps for LPUART
+Base Project : UART_Printf (\Repository\STM32Cube_FW_G4_V1.3.0\Projects\NUCLEO-G474RE\Examples\UART\UART_Printf)
+Strategy	 : from "UART_Printf" increase to more than 20Mbps
+
+** Default pins **
+
+** RCC **
+HSE
+PLLM = /6
+
+** SYS/Debug **
+Debug = Trace Async Sw
+
+** main.c **
+copy all /* USER CODE BEGIN PFP */, below
+	#ifdef __GNUC__
+	/* With GCC, small printf (option LD Linker->Libraries->Small printf
+	   set to 'Yes') calls __io_putchar() */
+	#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+	#else
+	#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+	#endif /* __GNUC__ */
+	
+copy /* USER CODE BEGIN 4 */, as per below
+	PUTCHAR_PROTOTYPE
+	{
+	  /* Place your implementation of fputc here */
+	  /* e.g. write a character to the LPUART1 and Loop until the end of transmission */
+	  HAL_UART_Transmit(&hlpuart1, (uint8_t *)&ch, 1, 0xFFFF);
+
+	  return ch;
+	}
+
+** in main.h **
+copy all /* USER CODE BEGIN Includes */, below
+	#include <stdio.h>
+	// #include "stm32g4xx_nucleo.h", no need for this
+	
+** LPUART1 ** 
+GPIO 
+	Speed Setting = Very high
+Parameter 
+	Baud Rate = 24285713 next is 28333332 but error
